@@ -4,9 +4,10 @@ from aiogram import Bot, Dispatcher
 from aiocryptopay import AioCryptoPay, Networks
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-
 from db import Database
 
+
+ADMIN_ID = 5156872018
 
 bot = Bot(os.environ.get("BOT_TOKEN"))
 dp = Dispatcher(bot, storage=MemoryStorage())

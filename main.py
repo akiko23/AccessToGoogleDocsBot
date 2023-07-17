@@ -4,7 +4,7 @@ from aiogram import executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-from config import bot, dp, db, crypto
+from config import bot, dp, db, crypto, ADMIN_ID
 from markups.markups import (
         main_menu, 
         to_main_menu as tm,
@@ -15,13 +15,12 @@ from functions import get_onetime_link
 from states.states import ChangeTableLink
 
 
-admin_id = 5156872018
 @dp.message_handler(commands=["start"])
 async def start(msg: types.Message):
     user_id = msg.from_user.id
     if not db.user_exists(user_id):
         db.add_user(user_id)
-    if user_id == admin_id:
+    if user_id == ADMIN_ID:
         extended_main_menu = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -55,31 +54,29 @@ async def main_menu_handler(call: types.CallbackQuery):
         else:
             await bot.send_message(user_id, "Для начала оплатите доступ", reply_markup=tm)
 
-    # Old python version on server
-    text = call.data.split("_")[1]
-    if text == "accesstotable1":
-        await process_access_to_table(table1_link)
-    elif text == "accesstotable2":
-        await process_access_to_table(table2_link)
-    elif text == "makepurchase":
-        if has_access:
-            await bot.send_message(user_id, "У вас уже есть доступ", reply_markup=tm)
-        else:
-            await bot.send_message(user_id, "Выберите валюту", reply_markup=currencies_menu)
-
-    elif text == "faq":
-        await bot.send_message(user_id, "faq", reply_markup=tm)
-        
-    elif text == "changetable":
-        await bot.send_message(user_id, "Выберите таблицу, ссылку на которую хотите изменить", reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text="Таблица 1", callback_data="changetablelink-1"),
-                    InlineKeyboardButton(text="Таблица 2", callback_data="changetablelink-2")
-                ],
-                [InlineKeyboardButton(text="В главное меню", callback_data="to_main_menu")]
-            ]
-        ))
+    choice = call.data.split("_")[1]
+    match choice:
+        case "accesstotable1":
+            await process_access_to_table(table1_link)
+        case "accesstotable2":
+            await process_access_to_table(table2_link)
+        case "makepurchase":
+            if has_access:
+                await bot.send_message(user_id, "У вас уже есть доступ", reply_markup=tm)
+            else:
+                await bot.send_message(user_id, "Выберите валюту", reply_markup=currencies_menu)
+        case "faq":
+            await bot.send_message(user_id, "faq", reply_markup=tm)
+        case "changetable":
+            await bot.send_message(user_id, "Выберите таблицу, ссылку на которую хотите изменить", reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(text="Таблица 1", callback_data="changetablelink-1"),
+                        InlineKeyboardButton(text="Таблица 2", callback_data="changetablelink-2")
+                    ],
+                    [InlineKeyboardButton(text="В главное меню", callback_data="to_main_menu")]
+                ]
+            ))
 
 
 @dp.callback_query_handler(lambda call: call.data.startswith("currency"))
@@ -172,7 +169,7 @@ async def cancel_changing(call, state):
 async def back_to_main_menu(call: types.CallbackQuery):
     await bot.delete_message(call.from_user.id, call.message.message_id)
 
-    if call.from_user.id == admin_id:
+    if call.from_user.id == ADMIN_ID:
         extended_main_menu = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
