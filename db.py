@@ -14,23 +14,17 @@ class Database():
 
     def add_user(self, user_id):
         with self.connection:
-            self.cursor.execute("INSERT INTO users(user_id, has_access) VALUES(?, 0)", (user_id, ))
+            self.cursor.execute("INSERT INTO users(user_id) VALUES(?)", (user_id, ))
     
-    def set_access(self, user_id):
+    def set_access(self, user_id, email):
+        start = int(time.time())
         with self.connection:
-            self.cursor.execute("UPDATE users SET access=1 WHERE user_id=?", (user_id, ))
-        
-    def reset_access(self):
-        with self.connection:
-            self.cursor.execute("UPDATE users SET has_access=0")
+            self.cursor.execute("UPDATE users SET email=?, sub_start=?, sub_end=? WHERE user_id=?", (email, start, start + timedelta(days=7).total_seconds(), user_id, ))
 
     def has_access(self, user_id):
         with self.connection:
-            resp = self.cursor.execute("SELECT has_access FROM users WHERE user_id=?", (user_id, ))
-        try:
-            return bool(int(resp.fetchone()[0]))
-        except:
-            return False
+            resp = self.cursor.execute("SELECT sub_end FROM users WHERE user_id=?", (user_id, )).fetchone()
+        return int(resp[0]) - int(time.time()) > 0
 
     def add_wallet(self, address, coin):
         with self.connection():
@@ -47,16 +41,24 @@ class Database():
             # 0 - free, 1 - occupied
             return self.cursor.execute("SELECT address FROM wallets WHERE status=0").fetchall()
 
-    def add_payment(self, user_id, wallet):
-        args = (user_id, wallet, int(time.time()) + timedelta(minutes=10).total_seconds())
+    def is_notified(self, user_id):
         with self.connection:
-            self.cursor.execute("UPDATE wallets SET status=1 WHERE wallet=?", (wallet, ))
-            self.cursor.execute("INSERT INTO payments(user_id, wallet, timeout) VALUES(?, ?, ?)", args)
+            return self.cursor.execute("SELECT is_notified FROM users WHERE user_id=?", (user_id, )).fetchone()[0] == 1
+
+    def get_users_with_overdue_sub(self):
+        with self.connection:
+            res = self.cursor.execute("SELECT user_id, email, sub_end FROM users WHERE sub_start<>'0'").fetchall()
+        return filter(lambda t: int(time.time()) - int(t[-1]) >= 0 and not self.is_notified(t[0]), res)
+
+
+    def set_notified(self, user_id, status):
+        with self.connection:
+            self.cursor.execute("UPDATE USERS SET is_notified=? WHERE user_id=?", (int(status), user_id))
 
 
 
-# db = Database()
-# db.add_payment(123, "agkgkoAKO=1GAKG1wegamgaogek3-gjd")
-# db.add_user(123)
+db = Database()
+# db.set_access(818525681)
+# print(*db.get_users_with_overdue_sub())
 # print(db.has_access(818525681))
 
