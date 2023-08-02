@@ -22,10 +22,7 @@ class HttpGetHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-
-        users = db.get_all_users()
-        self.wfile.write(tm.render(users=users).encode())
-
+        self.wfile.write(tm.render(users=db.get_all_users()).encode())
 
 
 if __name__ == "__main__":
