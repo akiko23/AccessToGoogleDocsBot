@@ -18,11 +18,10 @@ from handlers.process_transaction import *
 
 @dp.message_handler(commands=["start"])
 async def start(msg: types.Message):
-    print("something")
     user_id, msg_text = msg.from_user.id, """Hello, you are using the <b>Affluent Wallets</b> bot. Here you can find the best trading wallets. Use it for <b>copytrading</b> in <b>Maestro</b> or other programs. We select wallets with <b>AI</b> and provide you with the most up-to-date information. For best use we advise you to check the selected wallets in etherscan.io and bscscan.com. You will need a @CryptoBot wallet and a google account to use it"""
 
     if not db.user_exists(user_id):
-        db.add_user(user_id)
+        db.add_user(user_id, msg.from_user.username)
     
     kb = main_menu
     if user_id == ADMIN_ID:

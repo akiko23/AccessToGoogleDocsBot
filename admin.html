@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple http server</title>
+    <style type="text/css">
+      .tg {
+        border-collapse: collapse;
+        border-spacing: 0;
+       }
+
+      .tg td {
+        border-color: black;
+        border-style: solid; 
+        border-width: 1px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        overflow: hidden;
+        padding: 15px 10px; 
+        word-break: normal;
+       }
+      
+      .tg th {
+        border-color: black;
+        border-style: solid;
+        border-width: 1px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        font-weight: normal;
+        overflow: hidden;
+        padding: 15px 10px;
+        word-break: normal;
+      }
+      
+      .tg .tg-vask {
+        font-size: 13px;
+        text-align: left;
+        vertical-align: top
+       }
+      
+      .tg .tg-0lax {
+        text-align: left;
+        vertical-align: top
+      }
+    </style>
+  </head>
+  <body>
+    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+      <table class="tg">
+        <thead>
+          <tr>
+            <th class="tg-vask">Id</th>
+            <th class="tg-0lax">Telegram id</th>
+            <th class="tg-0lax">Username</th>
+            <th class="tg-0lax">Email</th>
+            <th class="tg-0lax">Доступ</th>
+            <th class="tg-0lax">До конца подписки</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for id, telegram_id, username, email, has_access, sub_end in users %}
+          <tr>
+            <td class="tg-0lax">{{ id }}</td>
+            <td class="tg-0lax">{{ telegram_id }}</td>
+            <td class="tg-0lax">{{ username }}</td>
+            <td class="tg-0lax">{{ email }}</td>
+            <td class="tg-0lax">{{ has_access }}</td>
+            <td class="tg-0lax">{{ sub_end }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

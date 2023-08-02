@@ -4,7 +4,7 @@ from config import db, bot, ADMIN_ID
 
 async def check_db():
     while True:
-        logging.warning("function works well")
+        # logging.warning("function works well")
         users_with_overdue_sub = db.get_users_with_overdue_sub()
         for uid, email, _ in users_with_overdue_sub:
             if not db.is_notified(uid):
